@@ -31,7 +31,10 @@ class AuthService {
         401
       );
     }
-    const checkCountry = countries.includes(Country) ? "valid" : "invalid";
+    const validity: Array<string> = ["valid", "invalid"];
+    const checkCountry = countries.includes(Country)
+      ? validity[0]
+      : validity[1];
     if (checkCountry.startsWith("in")) {
       throw new AppError(`${Country} Does Not Exists`, 401);
     }

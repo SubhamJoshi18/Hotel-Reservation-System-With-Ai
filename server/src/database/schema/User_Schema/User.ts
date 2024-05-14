@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { FieldCannotBeEmpty } from "../../../helpers/Schema/fieldNotEmpty";
+import { FieldCannotBeEmpty } from "../../../helpers/schema/fieldNotEmpty";
 
 const userSchema = new mongoose.Schema({
   username: {

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { FieldCannotBeEmpty } from "../../../helpers/Schema/fieldNotEmpty";
-import { MinExceed } from "../../../helpers/Schema/minExceed";
+import { FieldCannotBeEmpty } from "../../../helpers/schema/fieldNotEmpty";
+import { MinExceed } from "../../../helpers/schema/minExceed";
 const hotelSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -53,6 +53,10 @@ const hotelSchema = new mongoose.Schema({
   rating: {
     type: String,
     required: [true, FieldCannotBeEmpty("Hotel Rating")],
+  },
+  User: {
+    type: mongoose.Types.ObjectId,
+    ref: "User",
   },
 });
 

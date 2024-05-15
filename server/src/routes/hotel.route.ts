@@ -1,43 +1,53 @@
-import { Router } from "express";
-const hotelRouter = Router();
 import express from "express";
 import { Redis } from "ioredis";
-
+import { query } from "express-validator";
+import HotelModel from "../database/schema/Hotel_Schema/Hotel";
+import { Router } from "express";
+import HotelServices from "../services/HotelServices/hotel.service";
+import HotelController from "../controller/Hotel_Controller/hotel.controller";
+import limiter from "../utils/rateLimiter";
+import { checkCache } from "../middleware/redis.middleware";
 const redis = new Redis();
+const hotelRouter = Router();
 
-const checkCache = async (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
-  const cacheData = await redis.get("cachedData");
-  if (cacheData) {
-    return res.status(201).json({
-      message: "Redis db",
-      data: JSON.parse(cacheData),
-    });
-  } else {
-    next();
+class HotelRouter extends HotelController {
+  hotelmodel: any;
+  constructor(hotelModel: any) {
+    super(new HotelServices());
+    this.hotelmodel = HotelModel;
+
+    hotelRouter.get(
+      "/hotels",
+      limiter,
+      query("page").exists(),
+      query("limit").exists(),
+      checkCache,
+      this.GetAllHotels
+    );
+
+    hotelRouter.get(
+      "/hotel/name",
+      limiter,
+      query("name").exists(),
+      this.GetHotelByName
+    );
+
+    hotelRouter.get(
+      "/hotel/rating",
+      limiter,
+      query("rating").equals("rating").exists(),
+      this.GetHotelByRating
+    );
+
+    //Reviews
+    hotelRouter.post(
+      "/hotel/reviews",
+      limiter,
+      query("id").equals("id"),
+      this.PostReview
+    );
   }
-};
+}
 
-hotelRouter.get(
-  "/test",
-  async (req: express.Request, res: express.Response) => {
-    const cachedValue = await redis.get("cachedData");
-    if (cachedValue) {
-      return res.status(201).json({
-        message: "Redis db",
-        data: JSON.parse(cachedValue),
-      });
-    }
-    const datatoBeCached = { message: "Hello World" };
-    await redis.set("cachedData", JSON.stringify(datatoBeCached), "EX", 3600);
-    return res.status(201).json({
-      message: "Normal DB ",
-      data: datatoBeCached,
-    });
-  }
-);
-
+new HotelRouter(HotelModel);
 export default hotelRouter;

@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
     min: [3, "Must be at least 6, got {VALUE}"],
     mx: [50, "Must be at least Greater than 50, got {VALUE"],
   },
+  password: {
+    type: String,
+    required: [true, FieldCannotBeEmpty("Password")],
+    min: [8, "Must be at least 8, got {VALUE}"],
+  },
   Phone_Number: {
     type: String,
     required: [true, FieldCannotBeEmpty("Phone Number")],

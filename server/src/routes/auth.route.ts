@@ -3,6 +3,7 @@ import { Base } from "../controller/Auth_Controller/auth.controller";
 import * as User from "../database/schema/User_Schema/User";
 import AuthService from "../services/AuthServices/auth.service";
 import limiter from "../utils/rateLimiter";
+import { validateToken } from "../middleware/apiauth.middleware";
 const authRouter = Router();
 const authService = AuthService;
 class AuthRouter extends Base {
@@ -12,7 +13,11 @@ class AuthRouter extends Base {
     super(new authService());
     this.usermodel = User;
 
-    authRouter.post("/auth", limiter, this.signup);
+    authRouter.post("/auth/register", limiter, this.signup);
+    authRouter.post("/auth/login", limiter, this.login);
+    authRouter.get("/auth/test", validateToken, () => {
+      console.log("I Reached Here");
+    });
   }
 }
 

@@ -3,6 +3,9 @@ import userModel from "../../database/schema/User_Schema/User";
 import AppError from "../../Errors/AppError";
 import countries from "../../data/countryData";
 import bcryptjs from "bcrypt";
+import { App } from "../../server";
+import { IPayload } from "../../interfaces/interface";
+import JwtService from "../JwtServices/jwt.service";
 
 interface Iuser {
   username: string;
@@ -61,6 +64,36 @@ class AuthService {
     await newRegistered.save();
     const message = "User Registered SuccessFully";
     return message;
+  }
+
+  public async LoginService(body: any): Promise<any> {
+    const { email, password } = body;
+
+    const existEmail = await userModel.findOne({ email: email });
+    if (!existEmail) {
+      throw new AppError(`${email} You Entered Does Not Exists`, 403);
+    }
+    const checkPassword = await bcryptjs.compare(
+      password,
+      existEmail.get("password")
+    );
+    if (checkPassword) {
+      const payloadData: IPayload = {
+        user_id: existEmail._id,
+        user_name: existEmail.username,
+        user_country: existEmail.Country,
+      };
+      const jwtService = new JwtService();
+      const accessToken = await jwtService.createAccessToken(payloadData);
+      const responseData = {
+        accesstoken: accessToken,
+        user_name: existEmail.username,
+        user_country: existEmail.Country,
+        user_PhoneNumber: existEmail.Phone_Number,
+        user_id: existEmail._id,
+      };
+      return responseData;
+    }
   }
 }
 export default AuthService;

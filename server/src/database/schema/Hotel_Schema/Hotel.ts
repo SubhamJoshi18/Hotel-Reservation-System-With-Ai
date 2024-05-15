@@ -51,12 +51,12 @@ const hotelSchema = new mongoose.Schema({
     mx: [50, "Must be at least Greater than 50, got {VALUE"],
   },
   rating: {
-    type: String,
+    type: Number,
     required: [true, FieldCannotBeEmpty("Hotel Rating")],
   },
-  User: {
+  Review: {
     type: mongoose.Types.ObjectId,
-    ref: "User",
+    ref: "Review",
   },
 });
 

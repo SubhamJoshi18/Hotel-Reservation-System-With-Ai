@@ -1,1 +1,1 @@
-my new file contents
+var x = 10  function (){return x + 10}  
